@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分析报告 - 微信聊天分析器</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .card {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid #e3e6ea;
+        }
+        .report-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 0.375rem 0.375rem 0 0;
+        }
+        .report-content {
+            padding: 2rem;
+            background: white;
+            border-radius: 0 0 0.375rem 0.375rem;
+        }
+        .report-meta {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1.5rem;
+        }
+        .report-actions {
+            border-top: 1px solid #e3e6ea;
+            padding: 1rem 2rem;
+            background-color: #f8f9fa;
+            border-radius: 0 0 0.375rem 0.375rem;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 1rem 0;
+            margin-top: 2rem;
+            border-top: 1px solid #e3e6ea;
+        }
+        
+        /* 打印样式 */
+        @media print {
+            .navbar, .report-actions, .footer {
+                display: none !important;
+            }
+            body {
+                background: white !important;
+            }
+            .card {
+                box-shadow: none !important;
+                border: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-comments"></i> 微信聊天分析器
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/chat-analysis/">
+                            <i class="fas fa-chart-line"></i> 聊天分析
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/chat-analysis/history">
+                            <i class="fas fa-history"></i> 分析历史
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/config/">
+                            <i class="fas fa-cog"></i> 系统配置
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- 主要内容区域 -->
+    <main class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card">
+                    <!-- 报告头部 -->
+                    <div class="report-header">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h2 class="mb-1">
+                                    <i class="fas fa-file-alt"></i>
+                                    <span th:text="${report.chatName}">聊天分析报告</span>
+                                </h2>
+                                <p class="mb-0 opacity-75">
+                                    分析日期：<span th:text="${#temporals.format(report.analysisDate, 'yyyy年MM月dd日')}"></span>
+                                </p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="badge bg-light text-dark fs-6" th:switch="${report.status}">
+                                    <span th:case="'COMPLETED'">
+                                        <i class="fas fa-check-circle text-success"></i> 分析完成
+                                    </span>
+                                    <span th:case="'PROCESSING'">
+                                        <i class="fas fa-spinner fa-spin text-warning"></i> 分析中
+                                    </span>
+                                    <span th:case="'FAILED'">
+                                        <i class="fas fa-exclamation-triangle text-danger"></i> 分析失败
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 报告元信息 -->
+                    <div class="report-content">
+                        <div class="report-meta">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <strong>报告ID：</strong><br>
+                                    <span class="text-muted font-monospace" th:text="${report.reportId}"></span>
+                                </div>
+                                <div class="col-md-3">
+                                    <strong>生成时间：</strong><br>
+                                    <span class="text-muted" th:text="${#temporals.format(report.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                                </div>
+                                <div class="col-md-3" th:if="${report.completedAt}">
+                                    <strong>完成时间：</strong><br>
+                                    <span class="text-muted" th:text="${#temporals.format(report.completedAt, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                                </div>
+                                <div class="col-md-3">
+                                    <strong>分析状态：</strong><br>
+                                    <span class="badge" 
+                                          th:classappend="${report.status == 'COMPLETED'} ? 'bg-success' : 
+                                                         (${report.status == 'PROCESSING'} ? 'bg-warning' : 'bg-danger')"
+                                          th:text="${report.status == 'COMPLETED'} ? '已完成' : 
+                                                  (${report.status == 'PROCESSING'} ? '处理中' : '失败')"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 报告内容 -->
+                        <div class="report-main">
+                            <div th:if="${report.status == 'COMPLETED'}" 
+                                 th:utext="${report.finalReport}">
+                                <!-- AI生成的报告内容将在这里显示 -->
+                            </div>
+                            
+                            <div th:if="${report.status == 'FAILED'}" class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>分析失败</strong>
+                                <p th:text="${report.finalReport}">分析过程中出现错误</p>
+                            </div>
+                            
+                            <div th:if="${report.status == 'PROCESSING'}" class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-3 text-muted">正在分析中，请稍候...</p>
+                                <button class="btn btn-outline-primary" onclick="location.reload()">
+                                    <i class="fas fa-sync-alt"></i> 刷新页面
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 操作按钮 -->
+                    <div class="report-actions">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <a th:href="@{/chat-analysis/}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left"></i> 返回分析
+                                </a>
+                                <a th:href="@{/chat-analysis/history}" class="btn btn-outline-info ms-2">
+                                    <i class="fas fa-history"></i> 查看历史
+                                </a>
+                            </div>
+                            <div class="col-md-6 text-end" th:if="${report.status == 'COMPLETED'}">
+                                <button onclick="window.print()" class="btn btn-primary">
+                                    <i class="fas fa-print"></i> 打印报告
+                                </button>
+                                <button class="btn btn-success ms-2" onclick="downloadReport()">
+                                    <i class="fas fa-download"></i> 下载报告
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- 页脚 -->
+    <footer class="footer mt-auto">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-copyright"></i> 2024 微信聊天分析器
+                    </p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p class="text-muted mb-0">
+                        基于 Spring Boot 和 AI 技术构建
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // 下载报告功能
+        function downloadReport() {
+            const reportContent = document.querySelector('.report-main').innerHTML;
+            const reportTitle = document.querySelector('.report-header h2').textContent;
+            
+            const htmlContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>${reportTitle}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        h1, h2, h3 { color: #333; }
+                        .header { border-bottom: 2px solid #007bff; padding-bottom: 10px; margin-bottom: 20px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>${reportTitle}</h1>
+                        <p>生成时间：${new Date().toLocaleString('zh-CN')}</p>
+                    </div>
+                    ${reportContent}
+                </body>
+                </html>
+            `;
+            
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${reportTitle.replace(/[^\w\s-]/g, '')}.html`;
+            link.click();
+            
+            URL.revokeObjectURL(link.href);
+        }
+        
+        // 如果是处理中状态，定期刷新页面
+        if (document.querySelector('.spinner-border')) {
+            setTimeout(() => {
+                location.reload();
+            }, 10000); // 10秒后自动刷新
+        }
+    </script>
+</body>
+</html>
