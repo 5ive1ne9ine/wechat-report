@@ -193,7 +193,7 @@
                                     <!-- 动态填充搜索结果 -->
                                 </div>
                                 
-                                <input type="hidden" id="groupChatId" name="groupChatId">
+                                <input type="hidden" id="groupNiceName" name="niceName">
                             </div>
                             
                             <!-- 私聊选择区域 -->
@@ -414,8 +414,8 @@
          * 选择群聊
          */
         function selectGroup(groupId, groupName) {
-            // 设置隐藏字段值
-            document.getElementById('groupChatId').value = groupId;
+            // 设置隐藏字段值为群聊昵称
+            document.getElementById('groupNiceName').value = groupName;
             
             // 更新输入框显示
             document.getElementById('groupName').value = groupName;
@@ -435,7 +435,7 @@
          */
         function hideGroupResults() {
             document.getElementById('groupResults').style.display = 'none';
-            document.getElementById('groupChatId').value = '';
+            document.getElementById('groupNiceName').value = '';
         }
         
         /**
@@ -503,8 +503,8 @@
             }
             
             if (analysisType.value === 'group') {
-                const groupChatId = document.getElementById('groupChatId').value;
-                if (!groupChatId) {
+                const groupNiceName = document.getElementById('groupNiceName').value;
+                if (!groupNiceName) {
                     e.preventDefault();
                     showErrorMessage('请选择群聊');
                     return;

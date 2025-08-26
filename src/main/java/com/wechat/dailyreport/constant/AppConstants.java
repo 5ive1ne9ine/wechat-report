@@ -1,82 +1,95 @@
 package com.wechat.dailyreport.constant;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 /**
  * 应用常量类
  */
-public final class AppConstants {
+public interface AppConstants {
     
-    private AppConstants() {
-        // 工具类，不允许实例化
-    }
     
     /**
      * 服务类型常量
      */
-    public static final class ServiceType {
-        public static final String AI_SERVICE = "AI_SERVICE";
-        public static final String CHATLOG_SERVICE = "CHATLOG_SERVICE";
+    interface ServiceType {
+        String AI_SERVICE = "AI_SERVICE";
+        String CHATLOG_SERVICE = "CHATLOG_SERVICE";
     }
     
     /**
      * 报告状态常量
      */
-    public static final class ReportStatus {
-        public static final String PROCESSING = "PROCESSING";
-        public static final String COMPLETED = "COMPLETED";
-        public static final String FAILED = "FAILED";
+    interface ReportStatus {
+        String PROCESSING = "PROCESSING";
+        String COMPLETED = "COMPLETED";
+        String FAILED = "FAILED";
     }
     
     /**
      * 聊天类型常量
      */
-    public static final class ChatType {
-        public static final String GROUP = "GROUP";
-        public static final String PRIVATE = "PRIVATE";
+    interface ChatType {
+        String GROUP = "GROUP";
+        String PRIVATE = "PRIVATE";
     }
     
     /**
      * 消息类型常量
      */
-    public static final class MessageType {
-        public static final String TEXT = "TEXT";
-        public static final String IMAGE = "IMAGE";
-        public static final String FILE = "FILE";
-        public static final String VOICE = "VOICE";
-        public static final String VIDEO = "VIDEO";
+    interface MessageType {
+        String TEXT = "TEXT";
+        String IMAGE = "IMAGE";
+        String FILE = "FILE";
+        String VOICE = "VOICE";
+        String VIDEO = "VIDEO";
+
+        /**
+         * 1 文本消息
+         */
+        @Getter
+        @AllArgsConstructor
+        enum Type {
+            TEXT(1, "文本"),
+            ;
+            private Integer code;
+            private String desc;
+        }
+
     }
     
     /**
      * AI角色常量
      */
-    public static final class AIRole {
-        public static final String SYSTEM = "system";
-        public static final String USER = "user";
-        public static final String ASSISTANT = "assistant";
+    interface AIRole {
+        String SYSTEM = "system";
+        String USER = "user";
+        String ASSISTANT = "assistant";
     }
     
     /**
      * 缓存键常量
      */
-    public static final class CacheKey {
-        public static final String CHAT_SESSIONS = "chatSessions";
-        public static final String AI_CONFIG = "aiConfig";
-        public static final String CHATLOG_CONFIG = "chatlogConfig";
+    interface CacheKey {
+        String CHAT_SESSIONS = "chatSessions";
+        String AI_CONFIG = "aiConfig";
+        String CHATLOG_CONFIG = "chatlogConfig";
     }
     
     /**
      * 配置键常量
      */
-    public static final class ConfigKey {
+    interface ConfigKey {
         // AI服务配置键
-        public static final String AI_MODEL = "model";
-        public static final String AI_BASE_URL = "base_url";
-        public static final String AI_API_KEY = "api_key";
-        public static final String AI_TIMEOUT = "timeout";
-        public static final String AI_TEMPERATURE = "temperature";
-        public static final String AI_MAX_TOKENS = "max_tokens";
+        String AI_MODEL = "model";
+        String AI_BASE_URL = "base_url";
+        String AI_API_KEY = "api_key";
+        String AI_TIMEOUT = "timeout";
+        String AI_TEMPERATURE = "temperature";
+        String AI_MAX_TOKENS = "max_tokens";
         
         // Chatlog服务配置键
-        public static final String CHATLOG_BASE_URL = "base_url";
-        public static final String CHATLOG_TIMEOUT = "timeout";
+        String CHATLOG_BASE_URL = "base_url";
+        String CHATLOG_TIMEOUT = "timeout";
     }
 }

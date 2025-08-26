@@ -1,5 +1,6 @@
 package com.wechat.dailyreport.service;
 
+import com.wechat.dailyreport.constant.AppConstants;
 import com.wechat.dailyreport.service.ChatlogService.ChatMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -44,15 +45,15 @@ public class DataProcessorService {
     private boolean isValidMessage(ChatMessage message) {
         return message != null &&
                StringUtils.isNotBlank(message.getContent()) &&
-               "TEXT".equals(message.getMessageType()) &&
-               message.getTimestamp() != null;
+               AppConstants.MessageType.Type.TEXT.getCode().equals(message.getType()) &&
+               message.getTime() != null;
     }
     
     /**
      * 格式化单条消息
      */
     private String formatMessage(ChatMessage message) {
-        String timeStr = message.getTimestamp().format(FORMATTER);
+        String timeStr = message.getTime().format(FORMATTER);
         String senderName = StringUtils.isNotBlank(message.getSenderName()) ? 
                            message.getSenderName() : "未知用户";
         
@@ -73,7 +74,7 @@ public class DataProcessorService {
         
         long participantCount = messages.stream()
                 .filter(this::isValidMessage)
-                .map(ChatMessage::getSenderId)
+                .map(ChatMessage::getSender)
                 .distinct()
                 .count();
         

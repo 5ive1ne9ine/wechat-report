@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Collections;
@@ -29,7 +30,38 @@ public class ChatlogService {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public ChatSession getChatSessionByNiceName(String niceName) {
-        return null;
+        log.info("根据昵称获取聊天会话: niceName={}", niceName);
+        
+        if (niceName == null || niceName.trim().isEmpty()) {
+            return null;
+        }
+        
+        try {
+            // 先尝试搜索群聊
+            List<ChatSession> groupSessions = searchGroupChatsByName(niceName);
+            
+            // 查找完全匹配的群聊
+            ChatSession exactMatch = groupSessions.stream()
+                    .filter(session -> niceName.equals(session.getNickName()) || 
+                                      niceName.equals(session.getName()))
+                    .findFirst()
+                    .orElse(null);
+            
+            if (exactMatch != null) {
+                log.info("找到匹配的群聊会话: name={}, nickName={}", exactMatch.getName(), exactMatch.getNickName());
+                return exactMatch;
+            }
+            
+            // 如果没有找到群聊，可以在这里添加私聊的搜索逻辑
+            // TODO: 添加私聊会话查找逻辑
+            
+            log.warn("未找到匹配的聊天会话: niceName={}", niceName);
+            return null;
+            
+        } catch (Exception e) {
+            log.error("根据昵称获取聊天会话失败: niceName={}", niceName, e);
+            return null;
+        }
     }
 
     /**
@@ -58,15 +90,27 @@ public class ChatlogService {
      */
     @Data
     public static class ChatMessage {
-        private Long id;
-        private String messageId;
-        private String chatId;
-        private String senderId;
+        private Long seq;
+        private OffsetDateTime time;
+        private String talker;
+        private String talkerName;
+        private Boolean isChatRoom;
+        private String sender;
         private String senderName;
-        private String messageType;
+        private Integer type;
+        private Integer subType;
         private String content;
-        private LocalDateTime timestamp;
-        private LocalDateTime createdAt;
+        private ChatMessageContents contents;
+    }
+
+    /**
+     * 聊天消息数据子类
+     */
+    @Data
+    public static class ChatMessageContents {
+        private String imgfile;
+        private String md5;
+        private String thumb;
     }
     
     /**
@@ -164,25 +208,24 @@ public class ChatlogService {
     /**
      * 获取指定日期范围内的聊天消息
      */
-    public List<ChatMessage> getChatMessagesRange(String chatId, LocalDate startDate, LocalDate endDate) {
-        log.info("获取日期范围内的聊天消息: chatId={}, startDate={}, endDate={}", chatId, startDate, endDate);
+    public List<ChatMessage> getChatMessagesRange(String niceName, String startDate, String endDate) {
+        log.info("获取日期范围内的聊天消息: chatId={}, startDate={}, endDate={}", niceName, startDate, endDate);
         
         try {
             // 设置客户端 URL
             chatlogClient.setBaseUrl(chatlogConfigService.getChatlogConfig().getBaseUrl());
             
             List<ChatMessage> allMessages = chatlogClient.getChatMessagesRange(
-                    chatId, 
-                    startDate.format(DATE_FORMATTER), 
-                    endDate.format(DATE_FORMATTER)
+                    niceName,
+                    String.format("%s~%s", startDate, endDate),
+                    "json"
             );
             
-            log.info("从 Chatlog服务获取到 {} 条消息（日期范围）", allMessages.size());
-            
+            log.info("从 Chatlog服务获取到 {} 条消息（日期范围:{}-{}）", allMessages.size(), startDate, endDate);
             return allMessages;
         } catch (Exception e) {
-            log.error("从 Chatlog服务获取日期范围消息失败: chatId={}, startDate={}, endDate={}", 
-                    chatId, startDate, endDate, e);
+            log.error("从 Chatlog服务获取日期范围消息失败: chatId={}, startDate={}, endDate={}",
+                    niceName, startDate, endDate, e);
             throw new RuntimeException("获取日期范围内的聊天消息失败: " + e.getMessage());
         }
     }

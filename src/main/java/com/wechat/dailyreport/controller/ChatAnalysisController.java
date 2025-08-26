@@ -132,7 +132,7 @@ public class ChatAnalysisController {
             }
             
             // 执行分析逻辑
-            AnalysisReport report = chatAnalysisService.analyzeChatRange(chatTarget, start, end);
+            AnalysisReport report = chatAnalysisService.analyzeChatRange(chatTarget, startDate, endDate);
             return "redirect:/chat-analysis/report/" + report.getReportId();
         } catch (Exception e) {
             log.error("聊天分析失败", e);

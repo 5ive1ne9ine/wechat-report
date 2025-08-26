@@ -1,5 +1,6 @@
 package com.wechat.dailyreport.service;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,41 +48,41 @@ public class ChatAnalysisService {
         private String finalReport;
         private LocalDateTime createdAt;
         private LocalDateTime completedAt;
-        
+
         // Getters and Setters
         public String getReportId() { return reportId; }
         public AnalysisReport setReportId(String reportId) { this.reportId = reportId; return this; }
-        
+
         public String getChatId() { return chatId; }
         public AnalysisReport setChatId(String chatId) { this.chatId = chatId; return this; }
-        
+
         public String getChatName() { return chatName; }
         public AnalysisReport setChatName(String chatName) { this.chatName = chatName; return this; }
-        
+
         public LocalDate getAnalysisDate() { return analysisDate; }
         public AnalysisReport setAnalysisDate(LocalDate analysisDate) { this.analysisDate = analysisDate; return this; }
-        
+
         public LocalDate getStartDate() { return startDate; }
         public AnalysisReport setStartDate(LocalDate startDate) { this.startDate = startDate; return this; }
-        
+
         public LocalDate getEndDate() { return endDate; }
         public AnalysisReport setEndDate(LocalDate endDate) { this.endDate = endDate; return this; }
-        
+
         public String getStatus() { return status; }
         public AnalysisReport setStatus(String status) { this.status = status; return this; }
-        
+
         public String getRawData() { return rawData; }
         public AnalysisReport setRawData(String rawData) { this.rawData = rawData; return this; }
-        
+
         public String getStructuredData() { return structuredData; }
         public AnalysisReport setStructuredData(String structuredData) { this.structuredData = structuredData; return this; }
-        
+
         public String getFinalReport() { return finalReport; }
         public AnalysisReport setFinalReport(String finalReport) { this.finalReport = finalReport; return this; }
-        
+
         public LocalDateTime getCreatedAt() { return createdAt; }
         public AnalysisReport setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; return this; }
-        
+
         public LocalDateTime getCompletedAt() { return completedAt; }
         public AnalysisReport setCompletedAt(LocalDateTime completedAt) { this.completedAt = completedAt; return this; }
     }
@@ -161,11 +162,11 @@ public class ChatAnalysisService {
             throw new RuntimeException("聊天分析失败: " + e.getMessage());
         }
     }
-    public AnalysisReport analyzeChatRange(String niceName, LocalDate startDate, LocalDate endDate) {
+    public AnalysisReport analyzeChatRange(String niceName, String startDate, String endDate) {
         log.info("开始分析日期范围聊天数据: niceName={}, startDate={}, endDate={}", niceName, startDate, endDate);
         
         // 检查是否已存在相同的分析报告
-        AnalysisReport existingReport = getExistingRangeReport(niceName, startDate, endDate);
+        AnalysisReport existingReport = getExistingRangeReport(niceName, startDate, startDate);
         if (existingReport != null && "COMPLETED".equals(existingReport.getStatus())) {
             log.info("发现已存在的分析报告: {}", existingReport.getReportId());
             return existingReport;
@@ -178,7 +179,7 @@ public class ChatAnalysisService {
         }
         
         // 创建新的分析报告记录
-        AnalysisReport report = createAnalysisReportRange(niceName, chatSession.getNickName(), startDate, endDate);
+        AnalysisReport report = createAnalysisReportRange(niceName, chatSession.getNickName(), LocalDate.parse(startDate), LocalDate.parse(endDate));
         
         try {
             // 1. 获取日期范围内的聊天数据
@@ -258,9 +259,9 @@ public class ChatAnalysisService {
     /**
      * 检查是否存在相同的日期范围分析报告
      */
-    private AnalysisReport getExistingRangeReport(String chatId, LocalDate startDate, LocalDate endDate) {
+    private AnalysisReport getExistingRangeReport(String niceName, String startDate, String endDate) {
         return reportStorage.values().stream()
-                .filter(report -> chatId.equals(report.getChatId()) && 
+                .filter(report -> niceName.equals(report.getChatId()) &&
                                  startDate.equals(report.getStartDate()) &&
                                  endDate.equals(report.getEndDate()))
                 .findFirst()

@@ -1,5 +1,6 @@
 package com.wechat.dailyreport.client;
 
+import com.alibaba.fastjson2.JSON;
 import com.wechat.dailyreport.service.ChatlogService.ChatMessage;
 import com.wechat.dailyreport.service.ChatlogService.ChatSession;
 import lombok.extern.slf4j.Slf4j;
@@ -84,14 +85,14 @@ public class ChatlogClient {
     
     /**
      * 获取指定日期范围内的聊天消息记录
-     * 
-     * @param chatId 聊天ID
-     * @param startDate 开始日期，格式为 yyyy-MM-dd
-     * @param endDate 结束日期，格式为 yyyy-MM-dd
+     *
+     * @param niceName  聊天ID
+     * @param time 开始日期，格式为 yyyy-MM-dd
+     * @param format   结束日期，格式为 yyyy-MM-dd
      * @return 聊天消息列表
      */
-    public List<ChatMessage> getChatMessagesRange(String chatId, String startDate, String endDate) {
-        String url = baseUrl + "/api/chats/" + chatId + "/messages?start_date=" + startDate + "&end_date=" + endDate;
+    public List<ChatMessage> getChatMessagesRange(String niceName, String time, String format) {
+        String url = baseUrl + String.format("/api/v1/chatlog?talker=%s&time=%s&format=%s", niceName, time, format);
         log.info("调用Chatlog服务获取日期范围消息: {}", url);
         
         try {
@@ -101,7 +102,6 @@ public class ChatlogClient {
                     null,
                     new ParameterizedTypeReference<List<ChatMessage>>() {}
             );
-            
             return response.getBody();
         } catch (Exception e) {
             log.error("获取日期范围消息失败: {}", e.getMessage(), e);
