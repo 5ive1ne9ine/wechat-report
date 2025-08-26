@@ -114,7 +114,15 @@
                                     <span th:text="${report.chatName}">聊天分析报告</span>
                                 </h2>
                                 <p class="mb-0 opacity-75">
-                                    分析日期：<span th:text="${#temporals.format(report.analysisDate, 'yyyy年MM月dd日')}"></span>
+                                    <!-- 显示单个分析日期 -->
+                                    <span th:if="${report.analysisDate != null}">
+                                        分析日期：<span th:text="${#temporals.format(report.analysisDate, 'yyyy年MM月dd日')}"></span>
+                                    </span>
+                                    <!-- 显示日期范围 -->
+                                    <span th:if="${report.startDate != null and report.endDate != null}">
+                                        分析日期：<span th:text="${#temporals.format(report.startDate, 'yyyy年MM月dd日')}"></span>
+                                        至 <span th:text="${#temporals.format(report.endDate, 'yyyy年MM月dd日')}"></span>
+                                    </span>
                                 </p>
                             </div>
                             <div class="col-md-4 text-end">

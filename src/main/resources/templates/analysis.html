@@ -42,6 +42,44 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
+        .chat-section {
+            transition: all 0.3s ease;
+            border: 1px solid #e3e6ea;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            margin-bottom: 1rem;
+        }
+        .btn-group .btn-check:checked + .btn-outline-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+            color: white;
+        }
+        .group-results {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            background-color: white;
+        }
+        .group-result-item {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e9ecef;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .group-result-item:hover {
+            background-color: #f8f9fa;
+        }
+        .group-result-item.selected {
+            background-color: #e7f3ff;
+            border-left: 3px solid #0d6efd;
+        }
+        .search-loading {
+            text-align: center;
+            padding: 1rem;
+            color: #6c757d;
+        }
     </style>
 </head>
 <body>
@@ -117,34 +155,86 @@
                     </div>
                     <div class="card-body">
                         <form th:action="@{/chat-analysis/analyze}" method="post" id="analysisForm">
+                            <!-- 聊天类型选择 -->
+                            <div class="mb-4">
+                                <label class="form-label">
+                                    <i class="fas fa-comments"></i> 选择分析类型
+                                </label>
+                                <div class="btn-group w-100" role="group">
+                                    <input type="radio" class="btn-check" name="analysisType" id="groupChat" value="group">
+                                    <label class="btn btn-outline-primary" for="groupChat">
+                                        <i class="fas fa-users"></i> 群聊分析
+                                    </label>
+                                    
+                                    <input type="radio" class="btn-check" name="analysisType" id="privateChat" value="private">
+                                    <label class="btn btn-outline-primary" for="privateChat">
+                                        <i class="fas fa-user"></i> 私聊分析
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- 群聊选择区域 -->
+                            <div id="groupChatSection" class="chat-section" style="display: none;">
+                                <div class="mb-3">
+                                    <label for="groupName" class="form-label">
+                                        <i class="fas fa-search"></i> 群聊名称
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="text" id="groupName" name="groupName" 
+                                               class="form-control" placeholder="请输入群聊名称进行搜索，可为空">
+                                        <button type="button" class="btn btn-outline-primary" id="searchGroupBtn">
+                                            <i class="fas fa-search"></i> 搜索
+                                        </button>
+                                    </div>
+                                    <div class="form-text">输入群聊名称后点击搜索按钮，支持模糊匹配，留空可获取所有群聊</div>
+                                </div>
+                                
+                                <div id="groupResults" class="group-results" style="display: none;">
+                                    <!-- 动态填充搜索结果 -->
+                                </div>
+                                
+                                <input type="hidden" id="groupChatId" name="groupChatId">
+                            </div>
+                            
+                            <!-- 私聊选择区域 -->
+                            <div id="privateChatSection" class="chat-section" style="display: none;">
+                                <div class="mb-3">
+                                    <label for="privateTarget" class="form-label">
+                                        <i class="fas fa-user"></i> 选择私聊对象
+                                    </label>
+                                    <select id="privateTarget" name="privateChatId" class="form-select">
+                                        <option value="">请选择私聊对象</option>
+                                        <option th:each="session : ${privateChatSessions}" 
+                                                th:value="${session.name}" 
+                                                th:text="${session.nickName != null ? session.nickName : session.name}">
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="chatTarget" class="form-label">
-                                            <i class="fas fa-users"></i> 选择聊天对象
+                                        <label for="startDate" class="form-label">
+                                            <i class="fas fa-calendar-alt"></i> 开始日期
                                         </label>
-                                        <select id="chatTarget" name="chatTarget" class="form-select" required>
-                                            <option value="">请选择聊天对象</option>
-                                            <option th:each="session : ${chatSessions}" 
-                                                    th:value="${session.chatId}" 
-                                                    th:text="${session.chatName}"
-                                                    th:attr="data-type=${session.chatType}, data-members=${session.memberCount}">
-                                            </option>
-                                        </select>
-                                        <div class="form-text">选择要分析的聊天会话</div>
+                                        <input type="date" id="startDate" name="startDate" 
+                                               class="form-control" 
+                                               th:value="${defaultStartDate}"
+                                               required>
+                                        <div class="form-text">选择分析的开始日期</div>
                                     </div>
                                 </div>
-                                
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="analysisDate" class="form-label">
-                                            <i class="fas fa-calendar-alt"></i> 选择分析日期
+                                        <label for="endDate" class="form-label">
+                                            <i class="fas fa-calendar-alt"></i> 结束日期
                                         </label>
-                                        <input type="date" id="analysisDate" name="analysisDate" 
+                                        <input type="date" id="endDate" name="endDate" 
                                                class="form-control" 
-                                               th:value="${defaultDate}"
+                                               th:value="${defaultEndDate}"
                                                required>
-                                        <div class="form-text">选择要分析的聊天日期</div>
+                                        <div class="form-text">选择分析的结束日期</div>
                                     </div>
                                 </div>
                             </div>
@@ -223,28 +313,228 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // 聊天对象选择变化时显示信息
-        document.getElementById('chatTarget').addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            const chatInfo = document.getElementById('chatInfo');
-            const chatInfoText = document.getElementById('chatInfoText');
-            
-            if (selectedOption.value) {
-                const chatType = selectedOption.getAttribute('data-type');
-                const memberCount = selectedOption.getAttribute('data-members');
-                
-                let typeText = chatType === 'GROUP' ? '群聊' : '私聊';
-                let memberText = chatType === 'GROUP' ? `，成员数：${memberCount}` : '';
-                
-                chatInfoText.textContent = `聊天类型：${typeText}${memberText}`;
-                chatInfo.style.display = 'block';
-            } else {
-                chatInfo.style.display = 'none';
+        // 聊天类型切换
+        document.querySelectorAll('input[name="analysisType"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                toggleChatSections(this.value);
+            });
+        });
+        
+        // 群聊搜索按钮点击事件
+        document.getElementById('searchGroupBtn').addEventListener('click', function() {
+            const groupName = document.getElementById('groupName').value.trim();
+            // 允许输入任意字符，包括空字符串
+            searchGroupChats(groupName);
+        });
+        
+        // 群聊名称回车搜索（保留这个功能）
+        document.getElementById('groupName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('searchGroupBtn').click();
             }
         });
         
-        // 表单提交时显示加载状态
-        document.getElementById('analysisForm').addEventListener('submit', function() {
+        /**
+         * 切换聊天类型区域显示
+         */
+        function toggleChatSections(type) {
+            const groupSection = document.getElementById('groupChatSection');
+            const privateSection = document.getElementById('privateChatSection');
+            const chatInfo = document.getElementById('chatInfo');
+            
+            if (type === 'group') {
+                groupSection.style.display = 'block';
+                privateSection.style.display = 'none';
+            } else if (type === 'private') {
+                groupSection.style.display = 'none';  
+                privateSection.style.display = 'block';
+            }
+            
+            // 隐藏聊天信息
+            chatInfo.style.display = 'none';
+        }
+        
+        /**
+         * 搜索群聊
+         */
+        async function searchGroupChats(groupName) {
+            const resultsDiv = document.getElementById('groupResults');
+            
+            try {
+                // 显示加载状态
+                resultsDiv.style.display = 'block';
+                resultsDiv.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin"></i> 搜索中...</div>';
+                
+                const response = await fetch(`/chat-analysis/search-groups?name=${encodeURIComponent(groupName)}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const groups = await response.json();
+                renderGroupResults(groups);
+                
+            } catch (error) {
+                console.error('搜索群聊失败:', error);
+                showErrorMessage('搜索群聊失败，请稍后重试');
+                hideGroupResults();
+            }
+        }
+        
+        /**
+         * 渲染群聊搜索结果
+         */
+        function renderGroupResults(groups) {
+            const resultsDiv = document.getElementById('groupResults');
+            
+            if (groups.length === 0) {
+                resultsDiv.innerHTML = '<div class="search-loading">未找到匹配的群聊</div>';
+                return;
+            }
+            
+            let html = '';
+            groups.forEach(group => {
+                const displayName = group.nickName || group.name;
+                const memberCount = group.users ? group.users.length : 0;
+                
+                html += `
+                    <div class="group-result-item" onclick="selectGroup('${group.name}', '${displayName}')">
+                        <div class="fw-bold">${displayName}</div>
+                        <div class="text-muted small">
+                            <i class="fas fa-users"></i> 成员数：${memberCount}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        /**
+         * 选择群聊
+         */
+        function selectGroup(groupId, groupName) {
+            // 设置隐藏字段值
+            document.getElementById('groupChatId').value = groupId;
+            
+            // 更新输入框显示
+            document.getElementById('groupName').value = groupName;
+            
+            // 高亮选中项
+            document.querySelectorAll('.group-result-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            event.target.closest('.group-result-item').classList.add('selected');
+            
+            // 显示选择信息
+            showChatInfo(`已选择群聊：${groupName}`);
+        }
+        
+        /**
+         * 隐藏群聊搜索结果
+         */
+        function hideGroupResults() {
+            document.getElementById('groupResults').style.display = 'none';
+            document.getElementById('groupChatId').value = '';
+        }
+        
+        /**
+         * 私聊对象选择变化
+         */
+        document.getElementById('privateTarget').addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            
+            if (selectedOption.value) {
+                showChatInfo(`已选择私聊对象：${selectedOption.text}`);
+            } else {
+                hideChatInfo();
+            }
+        });
+        
+        /**
+         * 显示聊天信息
+         */
+        function showChatInfo(message) {
+            const chatInfo = document.getElementById('chatInfo');
+            const chatInfoText = document.getElementById('chatInfoText');
+            
+            chatInfoText.textContent = message;
+            chatInfo.style.display = 'block';
+        }
+        
+        /**
+         * 隐藏聊天信息
+         */
+        function hideChatInfo() {
+            document.getElementById('chatInfo').style.display = 'none';
+        }
+        
+        /**
+         * 显示错误消息
+         */
+        function showErrorMessage(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'alert alert-warning alert-dismissible fade show';
+            errorDiv.innerHTML = `
+                <i class="fas fa-exclamation-triangle"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.querySelector('.container').insertBefore(errorDiv, document.querySelector('.row'));
+            
+            // 3秒后自动消失
+            setTimeout(() => {
+                if (errorDiv.parentNode) {
+                    errorDiv.remove();
+                }
+            }, 3000);
+        }
+        
+        /**
+         * 表单提交验证
+         */
+        document.getElementById('analysisForm').addEventListener('submit', function(e) {
+            const analysisType = document.querySelector('input[name="analysisType"]:checked');
+            
+            if (!analysisType) {
+                e.preventDefault();
+                showErrorMessage('请选择分析类型');
+                return;
+            }
+            
+            if (analysisType.value === 'group') {
+                const groupChatId = document.getElementById('groupChatId').value;
+                if (!groupChatId) {
+                    e.preventDefault();
+                    showErrorMessage('请选择群聊');
+                    return;
+                }
+            } else if (analysisType.value === 'private') {
+                const privateChatId = document.getElementById('privateTarget').value;
+                if (!privateChatId) {
+                    e.preventDefault();
+                    showErrorMessage('请选择私聊对象');
+                    return;
+                }
+            }
+            
+            // 验证日期范围
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (!startDate || !endDate) {
+                e.preventDefault();
+                showErrorMessage('请选择完整的日期范围');
+                return;
+            }
+            
+            if (new Date(startDate) > new Date(endDate)) {
+                e.preventDefault();
+                showErrorMessage('开始日期不能晚于结束日期');
+                return;
+            }
+            
+            // 显示加载状态
             const analyzeBtn = document.getElementById('analyzeBtn');
             analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 分析中...';
             analyzeBtn.disabled = true;
