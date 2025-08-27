@@ -110,13 +110,10 @@
                                 <label for="aiModel" class="form-label">
                                     <i class="fas fa-robot"></i> AI模型
                                 </label>
-                                <select id="aiModel" th:field="*{model}" class="form-select" required>
-                                    <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                                    <option value="gpt-4">GPT-4</option>
-                                    <option value="gpt-4o-mini">GPT-4O Mini</option>
-                                    <option value="gpt-4o">GPT-4O</option>
-                                </select>
-                                <div class="form-text">选择使用的AI模型</div>
+                                <input type="text" id="aiModel" th:field="*{model}" 
+                                       class="form-control" required
+                                       th:value="${aiConfig.model ?: 'ernie-4.5-turbo-128k'}">
+                                <div class="form-text">输入使用的AI模型名称</div>
                             </div>
                             
                             <div class="mb-3">
@@ -125,7 +122,7 @@
                                 </label>
                                 <input type="url" id="aiBaseUrl" th:field="*{baseUrl}" 
                                        class="form-control" required
-                                       placeholder="https://api.openai.com">
+                                       th:value="${aiConfig.baseUrl ?: 'https://qianfan.baidubce.com/v2/'}">
                                 <div class="form-text">AI服务的基础URL地址</div>
                             </div>
                             
@@ -135,8 +132,7 @@
                                 </label>
                                 <div class="input-group">
                                     <input type="password" id="aiApiKey" th:field="*{apiKey}" 
-                                           class="form-control" required
-                                           placeholder="sk-...">
+                                           class="form-control" required>
                                     <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('aiApiKey')">
                                         <i class="fas fa-eye"></i>
                                     </button>
@@ -174,7 +170,7 @@
                                     <i class="fas fa-coins"></i> 最大令牌数
                                 </label>
                                 <input type="number" id="aiMaxTokens" th:field="*{maxTokens}" 
-                                       class="form-control" min="100" max="8000" step="100"
+                                       class="form-control" min="100" max="12288" step="100"
                                        required>
                                 <div class="form-text">AI模型最大输出令牌数</div>
                             </div>
@@ -241,57 +237,10 @@
             </div>
         </div>
         
-        <!-- 系统信息 -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="fas fa-info-circle"></i> 系统信息
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <strong>应用版本：</strong><br>
-                                <span class="text-muted">1.0.0</span>
-                            </div>
-                            <div class="col-md-3">
-                                <strong>Java版本：</strong><br>
-                                <span class="text-muted" th:text="${@environment.getProperty('java.version')}">Java 8</span>
-                            </div>
-                            <div class="col-md-3">
-                                <strong>Spring Boot版本：</strong><br>
-                                <span class="text-muted">3.2.0</span>
-                            </div>
-                            <div class="col-md-3">
-                                <strong>运行时间：</strong><br>
-                                <span class="text-muted" id="uptime">计算中...</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+
     </main>
     
-    <!-- 页脚 -->
-    <footer class="footer mt-auto">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <p class="text-muted mb-0">
-                        <i class="fas fa-copyright"></i> 2024 微信聊天分析器
-                    </p>
-                </div>
-                <div class="col-md-6 text-end">
-                    <p class="text-muted mb-0">
-                        基于 Spring Boot 和 AI 技术构建
-                    </p>
-                </div>
-            </div>
-        </div>
-    </footer>
+
     
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -328,22 +277,7 @@
             }, 2000);
         }
         
-        // 计算运行时间
-        function updateUptime() {
-            const startTime = new Date('2024-01-01T00:00:00'); // 这里应该是应用启动时间
-            const now = new Date();
-            const uptime = Math.floor((now - startTime) / 1000);
-            
-            const days = Math.floor(uptime / 86400);
-            const hours = Math.floor((uptime % 86400) / 3600);
-            const minutes = Math.floor((uptime % 3600) / 60);
-            
-            document.getElementById('uptime').textContent = `${days}天 ${hours}小时 ${minutes}分钟`;
-        }
-        
-        // 页面加载时更新运行时间
-        updateUptime();
-        setInterval(updateUptime, 60000); // 每分钟更新一次
+
     </script>
 </body>
 </html>

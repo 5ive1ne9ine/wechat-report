@@ -21,74 +21,74 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/config")
 @Slf4j
 public class ConfigController {
-    
+
     @Autowired
     private AIConfigService aiConfigService;
-    
+
     @Autowired
     private ChatlogConfigService chatlogConfigService;
-    
+
     /**
      * 配置页面
      */
     @GetMapping({"", "/"})
     public String configPage(Model model) {
         log.info("访问配置管理页面");
-        
+
         try {
             AIServiceConfig aiConfig = aiConfigService.getAIConfig();
             ChatlogServiceConfig chatlogConfig = chatlogConfigService.getChatlogConfig();
-            
+
             model.addAttribute("aiConfig", aiConfig);
             model.addAttribute("chatlogConfig", chatlogConfig);
-            
+
         } catch (Exception e) {
             log.error("获取配置信息失败", e);
             model.addAttribute("error", "获取配置信息失败: " + e.getMessage());
         }
-        
+
         return "config";
     }
-    
+
     /**
      * 更新AI服务配置
      */
     @PostMapping("/ai-service")
     public String updateAIConfig(@ModelAttribute AIServiceConfig config,
-                                RedirectAttributes redirectAttributes) {
-        
+                                 RedirectAttributes redirectAttributes) {
+
         log.info("更新AI服务配置: {}", config);
-        
+
         try {
             aiConfigService.updateAIConfig(config);
             redirectAttributes.addFlashAttribute("success", "AI服务配置更新成功");
-            
+
         } catch (Exception e) {
             log.error("更新AI服务配置失败", e);
             redirectAttributes.addFlashAttribute("error", "更新AI服务配置失败: " + e.getMessage());
         }
-        
+
         return "redirect:/config/";
     }
-    
+
     /**
      * 更新Chatlog服务配置
      */
     @PostMapping("/chatlog-service")
     public String updateChatlogConfig(@ModelAttribute ChatlogServiceConfig config,
-                                     RedirectAttributes redirectAttributes) {
-        
+                                      RedirectAttributes redirectAttributes) {
+
         log.info("更新Chatlog服务配置: {}", config);
-        
+
         try {
             chatlogConfigService.updateChatlogConfig(config);
             redirectAttributes.addFlashAttribute("success", "Chatlog服务配置更新成功");
-            
+
         } catch (Exception e) {
             log.error("更新Chatlog服务配置失败", e);
             redirectAttributes.addFlashAttribute("error", "更新Chatlog服务配置失败: " + e.getMessage());
         }
-        
+
         return "redirect:/config/";
     }
 }

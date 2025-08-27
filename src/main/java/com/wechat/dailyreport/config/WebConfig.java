@@ -13,7 +13,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-    
+
     /**
      * 配置RestTemplate
      */
@@ -21,7 +21,7 @@ public class WebConfig implements WebMvcConfigurer {
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
-    
+
     /**
      * 配置跨域请求
      */
@@ -34,7 +34,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowCredentials(true)
                 .maxAge(3600);
     }
-    
+
     /**
      * 配置静态资源处理
      */
@@ -42,17 +42,17 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/static/**")
                 .addResourceLocations("classpath:/static/");
-        
+
         registry.addResourceHandler("/css/**")
                 .addResourceLocations("classpath:/static/css/");
-        
+
         registry.addResourceHandler("/js/**")
                 .addResourceLocations("classpath:/static/js/");
-        
+
         registry.addResourceHandler("/images/**")
                 .addResourceLocations("classpath:/static/images/");
     }
-    
+
     /**
      * 配置视图控制器
      */

@@ -14,18 +14,6 @@ spring:
     mode: HTML
     cache: false
     encoding: UTF-8
-
-# 自定义配置
-app:
-  # AI服务配置
-  ai:
-    default:
-      model: gpt-3.5-turbo
-      base-url: https://api.openai.com
-      api-key: bce-v3/ALTAK-um46S332RQuEXjAurBr9F/26d93992b9308948c6eb64ecac4355865a4bb7dc
-      timeout: 60000
-      temperature: 0.7
-      max-tokens: 4000
       
   # Chatlog服务配置
   chatlog:
