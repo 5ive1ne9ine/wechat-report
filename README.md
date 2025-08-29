@@ -1,6 +1,8 @@
 # 微信聊天分析器 (wechat-report)
 
 一个基于Spring Boot的微信聊天数据智能分析系统，通过集成外部AI服务和Chatlog服务，实现对微信群聊和私聊数据的深度分析，生成结构化的HTML分析报告。
+设计参考: git@github.com:mengjian-github/wechat-daily-report.git
+技术上重新实现
 
 ## 🚀 功能特性
 
