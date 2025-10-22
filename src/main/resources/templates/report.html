@@ -51,6 +51,174 @@
             border-top: 1px solid #e3e6ea;
         }
         
+        /* 发言者卡片样式 */
+        .speaker-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        .speaker-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+        .speaker-card .speaker-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .speaker-card .speaker-rank {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            color: white;
+            margin-right: 15px;
+        }
+        .speaker-card .rank-1 { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); }
+        .speaker-card .rank-2 { background: linear-gradient(135deg, #C0C0C0 0%, #808080 100%); }
+        .speaker-card .rank-3 { background: linear-gradient(135deg, #CD7F32 0%, #8B4513 100%); }
+        .speaker-card .rank-other { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .speaker-card .speaker-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .speaker-card .message-count {
+            font-size: 16px;
+            color: #7f8c8d;
+            padding: 5px 15px;
+            background-color: #e3f2fd;
+            border-radius: 20px;
+        }
+        .speaker-card .speaker-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .speaker-card .stat-item {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .speaker-card .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        .speaker-card .stat-value {
+            font-size: 14px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        .speaker-card .tag-group {
+            margin-bottom: 12px;
+        }
+        .speaker-card .tag-label {
+            font-size: 13px;
+            color: #6c757d;
+            margin-bottom: 6px;
+        }
+        .speaker-card .badge {
+            margin: 3px;
+            padding: 5px 12px;
+            font-size: 12px;
+        }
+        .speaker-card .ai-comment {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-top: 12px;
+            font-style: italic;
+            color: #856404;
+            line-height: 1.6;
+        }
+        .speaker-card .ai-comment::before {
+            content: '"🔥 AI锐评："';
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        /* 热门发言样式 */
+        .hot-message-card {
+            border: 1px solid #ffc107;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #fff9e6 0%, #ffffff 100%);
+            box-shadow: 0 2px 6px rgba(255, 193, 7, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        .hot-message-card::before {
+            content: '"🔥"';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 80px;
+            opacity: 0.08;
+        }
+        .hot-message-card .hot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .hot-message-card .hot-sender {
+            font-weight: bold;
+            color: #e65100;
+            font-size: 15px;
+        }
+        .hot-message-card .hot-time {
+            font-size: 12px;
+            color: #9e9e9e;
+        }
+        .hot-message-card .hot-content {
+            background-color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            line-height: 1.6;
+            color: #333;
+            border-left: 3px solid #ffc107;
+        }
+        .hot-message-card .hot-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .hot-message-card .hot-score {
+            display: flex;
+            align-items: center;
+            color: #ff6f00;
+            font-weight: bold;
+        }
+        .hot-message-card .hot-score .fire-icons {
+            margin-right: 5px;
+            font-size: 14px;
+        }
+        .hot-message-card .hot-reason {
+            font-size: 12px;
+            color: #666;
+            background-color: #fff;
+            padding: 4px 10px;
+            border-radius: 12px;
+            border: 1px solid #ffe0b2;
+        }
+        
         /* 打印样式 */
         @media print {
             .navbar, .report-actions, .footer {
@@ -62,6 +230,9 @@
             .card {
                 box-shadow: none !important;
                 border: none !important;
+            }
+            .speaker-card, .hot-message-card {
+                page-break-inside: avoid;
             }
         }
     </style>
@@ -266,6 +437,173 @@
             setTimeout(() => {
                 location.reload();
             }, 10000); // 10秒后自动刷新
+        }
+        
+        // 页面加载完成后渲染动态数据
+        document.addEventListener('DOMContentLoaded', function() {
+            renderTopSpeakers();
+            renderHotMessages();
+        });
+        
+        /**
+         * 渲染发言达人榜
+         */
+        function renderTopSpeakers() {
+            const dataElement = document.getElementById('top-speakers-data');
+            const sectionElement = document.getElementById('top-speakers-section');
+            
+            if (!dataElement || !sectionElement) {
+                console.log('未找到发言者数据元素');
+                return;
+            }
+            
+            try {
+                const speakersData = JSON.parse(dataElement.textContent);
+                if (!speakersData || speakersData.length === 0) {
+                    console.log('发言者数据为空');
+                    return;
+                }
+                
+                let html = '<div class="row">';
+                speakersData.forEach((speaker, index) => {
+                    const rank = index + 1;
+                    const rankClass = rank <= 3 ? `rank-${rank}` : 'rank-other';
+                    
+                    html += `
+                        <div class="col-md-12 mb-3">
+                            <div class="speaker-card">
+                                <div class="speaker-header">
+                                    <div class="d-flex align-items-center">
+                                        <div class="speaker-rank ${rankClass}">
+                                            ${rank <= 3 ? ['🥇', '🥈', '🥉'][rank - 1] : rank}
+                                        </div>
+                                        <div>
+                                            <div class="speaker-name">${escapeHtml(speaker.nickname)}</div>
+                                        </div>
+                                    </div>
+                                    <div class="message-count">
+                                        <i class="fas fa-comments"></i> ${speaker.message_count} 条
+                                    </div>
+                                </div>
+                                
+                                <div class="speaker-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-label"><i class="fas fa-fire"></i> 主要话题</div>
+                                        <div class="stat-value">${speaker.main_topics ? speaker.main_topics.slice(0, 2).map(t => escapeHtml(t)).join('、') : '无'}</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label"><i class="fas fa-smile"></i> 语气类型</div>
+                                        <div class="stat-value">${escapeHtml(speaker.tone_type || '未知')}</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="tag-group">
+                                    <div class="tag-label"><i class="fas fa-tags"></i> 发言风格</div>
+                                    <div>
+                                        ${speaker.speaking_style ? speaker.speaking_style.map(tag => 
+                                            `<span class="badge bg-primary">${escapeHtml(tag)}</span>`
+                                        ).join('') : '<span class="badge bg-secondary">无标签</span>'}
+                                    </div>
+                                </div>
+                                
+                                <div class="tag-group">
+                                    <div class="tag-label"><i class="fas fa-user"></i> 人物画像</div>
+                                    <div>
+                                        ${speaker.profile_tags ? speaker.profile_tags.map(tag => 
+                                            `<span class="badge bg-info">${escapeHtml(tag)}</span>`
+                                        ).join('') : '<span class="badge bg-secondary">无画像</span>'}
+                                    </div>
+                                </div>
+                                
+                                ${speaker.ai_comment ? `
+                                    <div class="ai-comment">
+                                        ${escapeHtml(speaker.ai_comment)}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                
+                sectionElement.innerHTML += html;
+                console.log(`成功渲染 ${speakersData.length} 个发言者`);
+                
+            } catch (error) {
+                console.error('解析发言者数据失败:', error);
+                sectionElement.innerHTML += '<p class="text-danger">数据解析失败</p>';
+            }
+        }
+        
+        /**
+         * 渲染热门发言
+         */
+        function renderHotMessages() {
+            const dataElement = document.getElementById('hot-messages-data');
+            const sectionElement = document.getElementById('hot-messages-section');
+            
+            if (!dataElement || !sectionElement) {
+                console.log('未找到热门发言数据元素');
+                return;
+            }
+            
+            try {
+                const messagesData = JSON.parse(dataElement.textContent);
+                if (!messagesData || messagesData.length === 0) {
+                    console.log('热门发言数据为空');
+                    return;
+                }
+                
+                let html = '';
+                messagesData.forEach((msg, index) => {
+                    const hotScore = parseInt(msg.hot_score) || 5;
+                    const fireIcons = '🔥'.repeat(Math.min(hotScore, 10));
+                    
+                    html += `
+                        <div class="hot-message-card">
+                            <div class="hot-header">
+                                <div class="hot-sender">
+                                    <i class="fas fa-user-circle"></i> ${escapeHtml(msg.sender)}
+                                </div>
+                                <div class="hot-time">
+                                    <i class="fas fa-clock"></i> ${escapeHtml(msg.time)}
+                                </div>
+                            </div>
+                            
+                            <div class="hot-content">
+                                ${escapeHtml(msg.content)}
+                            </div>
+                            
+                            <div class="hot-footer">
+                                <div class="hot-score">
+                                    <span class="fire-icons">${fireIcons}</span>
+                                    <span>热度: ${hotScore}/10</span>
+                                </div>
+                                <div class="hot-reason">
+                                    ${escapeHtml(msg.hot_reason || '高热度发言')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                sectionElement.innerHTML += html;
+                console.log(`成功渲染 ${messagesData.length} 条热门发言`);
+                
+            } catch (error) {
+                console.error('解析热门发言数据失败:', error);
+                sectionElement.innerHTML += '<p class="text-danger">数据解析失败</p>';
+            }
+        }
+        
+        /**
+         * HTML转义函数，防止XSS攻击
+         */
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
     </script>
 </body>
